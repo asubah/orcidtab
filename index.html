@@ -11,7 +11,7 @@
     <h2>Fetch JSON Data and Display in Table using jQuery</h2>
     <div class="row form-input">
 	    <input id="orcid_url" type="url" required placeholder="ORCID URL" />
-	    <button id="fetchData">Fetch Data</button>
+	    <input id="fetchData">Fetch Data</input>
     </div>
     <div id="dataContainer" class="container"></div>
     <textarea id="json" name="summary" rows="5" readonly></textarea>
@@ -31,7 +31,7 @@
             headerRow.append("<th>Body</th>");
             thead.append(headerRow);
             table.append(thead);
-            $("#json").val(data);
+            $("#json").val(JSON.stringify(data));
 
             // Create the table body
             let tbody = $("<tbody>");
