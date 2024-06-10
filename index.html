@@ -31,7 +31,8 @@
             headerRow.append("<th>Body</th>");
             thead.append(headerRow);
             table.append(thead);
-            $("#json").val(JSON.stringify(data));
+            // $("#json").val(JSON.stringify(data));
+            $("#json").val(data.group[0]);
 
             // Create the table body
             let tbody = $("<tbody>");
