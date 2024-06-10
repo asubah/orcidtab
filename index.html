@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>JSON to HTML Table</title>
+		<style>
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+		th, td {
+			padding: 10px;
+		}
+		</style>
+	</head>
+	<body>
+		<h2>Convert JSON data into an HTML table using JavaScript</h2>
+		<button id="btn" onclick="convert()">Click Here</button>
+		<br><br>
+		<div id="container"></div>
+
+		<script>
+			function convert() {
+				// Sample JSON data
+				let jsonData = [
+					{ "name": "Saurabh", "age": "20", "city": "Prayagraj" },
+					{ "name": "Vipin", "age": 23, "city": "Lucknow" },
+					{ "name": "Saksham", "age": 21, "city": "Noida" }
+				];
+
+				// Get the container element where the table will be inserted
+				let container = document.getElementById("container");
+
+				// Create the table element
+				let table = document.createElement("table");
+
+				// Get the keys (column names) of the first object in the JSON data
+				let cols = Object.keys(jsonData[0]);
+
+				// Create the header element
+				let thead = document.createElement("thead");
+				let tr = document.createElement("tr");
+
+				// Loop through the column names and create header cells
+				cols.forEach(function(item) {
+					let th = document.createElement("th");
+					th.textContent = item;
+					tr.appendChild(th);
+				});
+
+				thead.appendChild(tr);
+				table.appendChild(thead);
+
+				// Create the body element
+				let tbody = document.createElement("tbody");
+
+				// Loop through the JSON data, create table rows, and populate cells
+				jsonData.forEach(function(item) {
+					let tr = document.createElement("tr");
+					Object.values(item).forEach(function(value) {
+						let td = document.createElement("td");
+						td.textContent = value;
+						tr.appendChild(td);
+					});
+					tbody.appendChild(tr);
+				});
+
+				table.appendChild(tbody);
+				container.appendChild(table);
+			}
+		</script>
+	</body>
+</html>
