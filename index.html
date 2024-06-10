@@ -37,9 +37,7 @@
             let tbody = $("<tbody>");
             $.each(data, function(index, item) {
               let row = $("<tr>");
-              row.append("<td>" + item.id + "</td>");
-              row.append("<td>" + item.title + "</td>");
-              row.append("<td>" + item.body + "</td>");
+              row.append("<td>" + item.work-sammary + "</td>");
               tbody.append(row);
             });
             table.append(tbody);
