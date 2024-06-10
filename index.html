@@ -26,9 +26,7 @@
             // Create the table header
             let thead = $("<thead>");
             let headerRow = $("<tr>");
-            headerRow.append("<th>ID</th>");
             headerRow.append("<th>Title</th>");
-            headerRow.append("<th>Body</th>");
             thead.append(headerRow);
             table.append(thead);
             // $("#json").val(JSON.stringify(data));
@@ -36,11 +34,13 @@
 
             // Create the table body
             let tbody = $("<tbody>");
-            $.each(data, function(index, item) {
+            $.each(data.group, function(index, item) {
               let row = $("<tr>");
-              row.append("<td>" + item.work-sammary + "</td>");
+		    row.append("<td>" + item["work-summary"]["title"]["title"]["value"] + "</td>");
+              row.append("</tr>");
               tbody.append(row);
             });
+            tbody.append("</tbody>");
             table.append(tbody);
 
             // Append the table to the container
