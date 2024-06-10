@@ -17,13 +17,18 @@ table, th, td {
   </head>
   <body>
     <h2>Fetch JSON Data and Display in Table using jQuery</h2>
+    <form id="form-container">
+      <div class="row form-input">
+        <input id="orcid_url" type="url" required placeholder="ORCID URL" />
+      </div>
+    </form>
     <button id="fetchData">Fetch Data</button>
     <div id="dataContainer"></div>
 
     <script>
       $(document).ready(function() {
         $("#fetchData").click(function() {
-          $.getJSON("https://jsonplaceholder.typicode.com/posts", function(data) {
+          $.getJSON($("#orcid_url").val(), function(data) {
             // Create the table element
             let table = $("<table>");
 
