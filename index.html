@@ -7,48 +7,117 @@
     <title>Fetch JSON Data with jQuery</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   </head>
-  <body>
+  <body class="container">
     <h2>Fetch JSON Data and Display in Table using jQuery</h2>
     <div class="row form-input">
-	    <input id="orcid_url" type="url" required placeholder="ORCID URL" />
+	    <input id="orcid_num" type="text" minlength="19" maxlength="19" required placeholder="ORCID Number" />
 	    <input type="button" id="fetchData" value="Fetch Data" />
     </div>
-    <div id="dataContainer" class="container"></div>
-    <textarea id="json" name="summary" rows="5" readonly></textarea>
+    <div id="dataContainer" class="overflow-auto"></div>
 
     <script>
-      $(document).ready(function() {
-        $("#fetchData").click(function() {
-          $.getJSON($("#orcid_url").val(), function(data) {
-            // Create the table element
-            let table = $("<table>");
+      // EP = End Point
+      const ORCID_API_BASE_URL = "https://pub.orcid.org/v3.0";
+      const EP_WORKS_LIST = "/works/";
+      const EP_SINGLE_WORK = "/work/";
+      orcid = "";
 
-            // Create the table header
-            let thead = $("<thead>");
-            let headerRow = $("<tr>");
-            headerRow.append("<th>Title</th>");
-            thead.append(headerRow);
-            table.append(thead);
-            // $("#json").val(JSON.stringify(data));
-            $("#json").val(data.group[0]);
+      works_paths = [];
 
-            // Create the table body
-            let tbody = $("<tbody>");
-            $.each(data.group, function(index, item) {
+      function fetchListOfWorks() {
+        if(! $("#orcid_num").get(0).reportValidity())
+          return;
+
+        orcid = $("#orcid_num").val();
+
+        let url = ORCID_API_BASE_URL + "/" + orcid + EP_WORKS_LIST;
+
+        $.getJSON(url, function(data) {
+
+          $.each(data.group, (index, item) => { works_paths.push(item["work-summary"][0]["path"]); });
+          // console.log(works_paths);
+
+          let table = $("<table>");
+          let thead = $("<thead>");
+          let headerRow = $("<tr>");
+          let headers = ["Paper Title",	"Authors",	"ORCID Number",	"College",	"Department",	"Journal Title",	"Publisher",	"Scopus?",	"Affiliation",	"Year",	"Volume",	"Issue",	"Pages",	"Field of Research",	"URL"];
+          $.each(headers, (index, header) => headerRow.append("<th>" + header + "</th>"));
+
+          let tbody = $("<tbody>");
+          $.each(works_paths, (index, path) => {
+            $.getJSON(ORCID_API_BASE_URL + path, (data) => {
+              console.log(data);
               let row = $("<tr>");
-		    row.append("<td>" + item["work-summary"]["title"]["title"]["value"] + "</td>");
-              row.append("</tr>");
+              // row.append("<td>" + index + "</td>");
+              row.append("<td>" + data["title"]["title"]["value"] + "</td>");
+              
+              authors = [];
+              $.each(data["contributors"]["contributor"], (_, contrib) => {
+                if (! contrib["contributor-attributes"]) {
+                  authors.push(contrib["credit-name"]["value"]);
+                } else if (contrib["contributor-attributes"]["contributor-role"] === "author") {
+                  // console.log(contrib["credit-name"]["value"]);
+                  authors.push(contrib["credit-name"]["value"]);
+                }
+              });
+
+              row.append("<td>" + authors.join(", ") + "</td>");
+              row.append("<td>" + orcid + "</td>");
+              row.append("<td>" + "IT" + "</td>");
+              row.append("<td>" + "CS" + "</td>");
+              row.append("<td>" + (data["journal-title"] ? data["journal-title"]["value"] : "") + "</td>");
+
+              publisher = "";
+              if (data["citation"]) {
+                match = data["citation"]["citation-value"].match(/publisher\s*=\s*\{(.*?)\}/);
+                if (match)
+                  publisher = match[1];
+              }
+              row.append("<td>" + publisher + "</td>");
+
+              row.append("<td></td>"); // Scopus?
+              row.append("<td>UOB</td>");
+              row.append("<td>" + data["publication-date"]["year"]["value"] + "</td>");
+
+              volume = "";
+              if (data["citation"]) {
+                match = data["citation"]["citation-value"].match(/volume\s*=\s*\{(.*?)\}/);
+                if (match)
+                  volume = match[1];
+              }
+              row.append("<td>" + volume + "</td>");
+
+              issue = "";
+              if (data["citation"]) {
+                match = data["citation"]["citation-value"].match(/issue\s*=\s*\{(.*?)\}/);
+                if (match)
+                  issue = match[1];
+              }
+              pages = "";
+              if (data["citation"]) {
+                match = data["citation"]["citation-value"].match(/pages\s*=\s*\{(.*?)\}/);
+                if (match)
+                  pages = match[1];
+              }
+              row.append("<td>" + pages + "</td>");
+
+              row.append("<td></td>"); // Field
               tbody.append(row);
             });
-            tbody.append("</tbody>");
-            table.append(tbody);
-
-            // Append the table to the container
-            $("#dataContainer").html(table);
-          }).fail(function(jqXHR, textStatus, errorThrown) {
-            console.error("Error fetching data: ", textStatus, errorThrown);
           });
+
+          thead.append(headerRow);
+          table.append(thead);
+          table.append(tbody);
+          $("#dataContainer").html(table);
+
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          console.error("Error fetching data: ", textStatus, errorThrown);
         });
+      }
+
+      $(document).ready(function() {
+        $("#fetchData").click(fetchListOfWorks);
       });
     </script>
   </body>
